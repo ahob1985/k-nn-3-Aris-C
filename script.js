@@ -14,6 +14,9 @@ let rightButton;
 let centerButton;
 let buttonDiv2;
 let saveButton;
+let ballX;
+let ballY;
+let ballSpeed;
 
 // Global ML Variables
 let featureExtractor;
@@ -42,6 +45,11 @@ function setup() {
   lefts = 0;
   rights = 0;
   centers = 0;
+  ballX = width / 2;
+  ballY = height / 2;
+  ballSpeed = 5;
+  video = createCapture(VIDEO, videoReady);
+  video.parent(canvasDiv);
   // new code below
 
 }
@@ -52,13 +60,14 @@ function draw() {
     if(knnClassifier.getNumLabels() > 0) {
       knnClassifier.classify(imgFeatures, gotResults);
       // new code below
-
+      background(225);
+      drawBall();
     }
   }
 }
 
 function drawBall() {
-  fill(0);
+  fill(200);
   ellipse(ballX, ballY, 36);
   let labelString = textP.html().toLowerCase();
   if(labelString.includes("up")) {
@@ -127,14 +136,20 @@ function buildButtons() {
 }
 
 function videoReady() {
-  video.style("display", "none");
+ // video.style("display", "none");
   // new code below
-
+  video.style("transform", "scale(-1, 1)");
   featureExtractor = ml5.featureExtractor("MobileNet", featureExtractorLoaded);
 }
 
 function featureExtractorLoaded() {
-
+knnClassifier = ml5.KNNClassifier();
+knnClassifier.load("model/myKNN.json", function(){
+  isModelReady = true;
+  textP.html("Begin posting and adding data!");
+  buttonDiv.style("display", "block");
+  buttonDiv2.style("display", "block");
+});
 }
 
 function gotResults(error, results) {
